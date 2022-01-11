@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.ArrayList;
 
 
-
 public class Server extends WebSocketServer {
 
     private final Map<String, WebSocket> connections;
     List<String> readyPlayers = new ArrayList<String>();
-
+    Game currentGame;
+    private Boolean isGameStarted = false;
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
@@ -77,11 +77,28 @@ public class Server extends WebSocketServer {
                         broadcast("Player " + playerId(c) + ": NOT READY");
                     }
                 }
+                if (readyPlayers.size() == connections.size()) {
+                    broadcast("All players are ready, starting game");
+                    broadcast("Below you will see the word list:");
+                    isGameStarted = true;
+                    currentGame = new Game(readyPlayers);
+                    String listString = String.join(", ", currentGame.startGame());
+                    broadcast(listString);
+                }
             }
-            if (readyPlayers.size() == connections.size()) {
-                broadcast("All players are ready, starting game");
+        }
+
+        if(isGameStarted){
+            currentGame.verifyAnswer(playerId(conn), message);
+            broadcast(currentGame.leaderBoard());
+            String winner = currentGame.verifyWinner();
+            if(winner != null){
+                broadcast(winner);
+                isGameStarted = false;
             }
-        } 
+        }
+
+
 
     }
 

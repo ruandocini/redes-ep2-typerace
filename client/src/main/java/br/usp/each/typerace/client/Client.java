@@ -28,6 +28,6 @@ public class Client extends WebSocketClient {
 
     @Override
     public void onError(Exception ex) {
-        // TODO: Implementar
+        ex.printStackTrace();
     }
 }
