@@ -57,6 +57,7 @@ public class Server extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
+
     }
 
     @Override
