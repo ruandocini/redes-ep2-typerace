@@ -7,10 +7,16 @@ import org.java_websocket.server.WebSocketServer;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.ArrayList;
+
+
 
 public class Server extends WebSocketServer {
 
     private final Map<String, WebSocket> connections;
+    List<String> readyPlayers = new ArrayList<String>();
+
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
@@ -57,6 +63,25 @@ public class Server extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
+
+        if (message.equals("start")) {
+            if (readyPlayers.contains(playerId(conn))) {
+                conn.send("You are already prepared\n");
+            } else {
+                readyPlayers.add(playerId(conn));
+                for (WebSocket c : connections.values()) {
+                    if (readyPlayers.contains(playerId(c))) {
+                        broadcast("Player " + playerId(c) + ": READY");
+                    }
+                    else{
+                        broadcast("Player " + playerId(c) + ": NOT READY");
+                    }
+                }
+            }
+            if (readyPlayers.size() == connections.size()) {
+                broadcast("All players are ready, starting game");
+            }
+        } 
 
     }
 

@@ -13,7 +13,7 @@ public class Client extends WebSocketClient {
 
     @Override
     public void onOpen(ServerHandshake handshakedata) {
-        send("Connected");
+        send("Successfully connected");
     }
 
     @Override
