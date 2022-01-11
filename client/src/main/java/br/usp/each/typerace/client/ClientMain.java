@@ -4,6 +4,8 @@ import org.java_websocket.client.WebSocketClient;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 public class ClientMain {
 
@@ -13,28 +15,58 @@ public class ClientMain {
         this.client = client;
     }
 
-    public void init(String idCliente) {
-        System.out.println("Iniciando cliente: " + idCliente);
-        // TODO: Implementar
+    public void init(String username) {
+        System.out.println("Starting client " + username);
+        client.connect();
     }
 
-    public static void main(String[] args) {
-        /*
-           FIXME: Remover essas strings fixas
-           Como podemos fazer para que o cliente receba um parâmetro indicando a qual servidor
-           ele deve se conectar e o seu ID?
-        */
-        String removeMe = "ws://localhost:8080";
-        String removeMe2 = "idCliente";
+    public static void main(String[] args) throws URISyntaxException, InterruptedException {
+        
+        Scanner input = new Scanner(System.in);
+        System.out.println("\nType the adress of the server (defaults to ws://localhost:8080): ");
+        String customServer = input.nextLine();
 
-        try {
-            WebSocketClient client = new Client(new URI(removeMe));
+        String finalServer = "ws://localhost:8080";
 
-            ClientMain main = new ClientMain(client);
+        if (!customServer.isEmpty()) {
+            finalServer = customServer;
+        }       
 
-            main.init(removeMe2);
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        WebSocketClient client;
+
+        while(true) {
+
+            System.out.println("Insert an username");
+
+            String username = input.nextLine();
+
+            if (username.isEmpty()) {
+                System.out.println("Empty name, plis insert a valid name");
+                continue;
+            }
+
+            finalServer += "/username=" + username;
+
+            client = new Client(new URI(finalServer));
+                        
+            client.connect();
+
+            TimeUnit.SECONDS.sleep(1);
+
+            if(client.isOpen()) {
+                break;
+            }
+            else{
+                finalServer = "ws://localhost:8080";
+            }
         }
+
+        while(true) {
+            String in = input.nextLine();
+            client.send(in);
+        }
+
     }
+
+    
 }

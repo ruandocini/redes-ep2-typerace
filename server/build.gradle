@@ -26,3 +26,7 @@ test {
 application {
     mainClass = 'br.usp.each.typerace.server.ServerMain'
 }
+
+run {
+    standardInput = System.in
+}

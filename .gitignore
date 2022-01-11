@@ -1,4 +1,8 @@
 
+#personal env stuff
+.vscode
+logger.properties
+
 # Created by https://www.toptal.com/developers/gitignore/api/gradle,intellij,java
 # Edit at https://www.toptal.com/developers/gitignore?templates=gradle,intellij,java
 

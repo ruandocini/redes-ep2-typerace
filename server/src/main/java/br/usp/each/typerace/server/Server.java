@@ -6,6 +6,7 @@ import org.java_websocket.server.WebSocketServer;
 
 import java.net.InetSocketAddress;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class Server extends WebSocketServer {
 
@@ -18,26 +19,53 @@ public class Server extends WebSocketServer {
 
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
-        // TODO: Implementar
+
+        if(idValidator(conn)){
+            String username = playerId(conn);
+            connections.put(username, conn);
+            conn.send("Welcome " + username);
+            broadcast("New player " + username + " connected," +
+                    " there are " + connections.size() + " players online");
+        }
+
     }
+
+    private String playerId(WebSocket conn) {
+        String connInfos = conn.getResourceDescriptor();
+        return connInfos.substring(connInfos.indexOf("username=") + 9);
+    }
+
+    private boolean idValidator(WebSocket conn) {
+        if(connections.containsKey(playerId(conn))) {
+            conn.send("Username already taken\n");
+            conn.close(1000, "invalidName");
+            return false;
+        }
+
+        return true;
+    }
+    
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
-        // TODO: Implementar
+        String username = playerId(conn);
+        connections.remove(username);
+        broadcast("Player " + username + " left, " + connections.size() + " players left");
+        System.out.println("Player " + username + " left, " + connections.size() + " players left");
     }
 
     @Override
     public void onMessage(WebSocket conn, String message) {
-        // TODO: Implementar
+        System.out.println("Message received from [" + playerId(conn) + "] :" + message);
     }
 
     @Override
     public void onError(WebSocket conn, Exception ex) {
-        // TODO: Implementar
+        ex.printStackTrace();
     }
 
     @Override
     public void onStart() {
-        // TODO: Implementar
+        System.out.println("Server started on port: " + getPort());
     }
 }
