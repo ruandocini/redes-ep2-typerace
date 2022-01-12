@@ -17,6 +17,7 @@ public class Server extends WebSocketServer {
     List<String> readyPlayers = new ArrayList<String>();
     Game currentGame;
     private Boolean isGameStarted = false;
+    long startTime = 0;
 
     public Server(int port, Map<String, WebSocket> connections) {
         super(new InetSocketAddress(port));
@@ -49,8 +50,7 @@ public class Server extends WebSocketServer {
         }
 
         return true;
-    }
-    
+    }    
 
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
@@ -63,6 +63,20 @@ public class Server extends WebSocketServer {
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
+
+        if(isGameStarted){
+            currentGame.verifyAnswer(playerId(conn), message);
+            String winner = currentGame.verifyWinner();
+            if(winner != null){
+                broadcast(winner);
+                broadcast(currentGame.leaderBoard());
+                long elapsedTime = System.currentTimeMillis() - startTime;
+                broadcast("Time elapsed: " + elapsedTime/1000 + " seconds");
+                isGameStarted = false;
+                readyPlayers.clear();
+            }
+            conn.send(currentGame.sendWord(playerId(conn)));
+        }
 
         if (message.equals("start")) {
             if (readyPlayers.contains(playerId(conn))) {
@@ -79,27 +93,14 @@ public class Server extends WebSocketServer {
                 }
                 if (readyPlayers.size() == connections.size()) {
                     broadcast("All players are ready, starting game");
-                    broadcast("Below you will see the word list:");
+                    broadcast("First word below:");
                     isGameStarted = true;
                     currentGame = new Game(readyPlayers);
-                    String listString = String.join(", ", currentGame.startGame());
-                    broadcast(listString);
+                    broadcast(currentGame.sendWord(playerId(conn)));
+                    startTime = System.currentTimeMillis();
                 }
             }
         }
-
-        if(isGameStarted){
-            currentGame.verifyAnswer(playerId(conn), message);
-            broadcast(currentGame.leaderBoard());
-            String winner = currentGame.verifyWinner();
-            if(winner != null){
-                broadcast(winner);
-                isGameStarted = false;
-            }
-        }
-
-
-
     }
 
     @Override
