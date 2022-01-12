@@ -31,9 +31,12 @@ public class Server extends WebSocketServer {
             String username = playerId(conn);
             connections.put(username, conn);
             conn.send("Welcome " + username);
+            conn.send(menuGame());
             broadcast("New player " + username + " connected," +
                     " there are " + connections.size() + " players online");
+            
         }
+
 
     }
 
@@ -60,6 +63,13 @@ public class Server extends WebSocketServer {
         System.out.println("Player " + username + " left, " + connections.size() + " players left");
     }
 
+    public String menuGame(){
+        return "MENU\n"+
+                "\n- start: to start the game, when all players are ready\n"+
+                "\n- exit: quit game in any point of the game\n" +
+                "\n\n- Have fun fella\n";
+    } 
+
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
@@ -74,8 +84,9 @@ public class Server extends WebSocketServer {
                 broadcast("Time elapsed: " + elapsedTime/1000 + " seconds");
                 isGameStarted = false;
                 readyPlayers.clear();
+            } else{
+                conn.send(currentGame.sendWord(playerId(conn)));
             }
-            conn.send(currentGame.sendWord(playerId(conn)));
         }
 
         if (message.equals("start")) {
