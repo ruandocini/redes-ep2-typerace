@@ -13,7 +13,7 @@ Repository designed for programming exercise of the discipline Computer Networks
 * JDK 11 ou greater 
 * Gradle (included on the repository, installation not nedded)
 
-### Rodando
+### Exectution instructions
 Run server
 ```sh
 ./gradlew server:run
