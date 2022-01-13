@@ -80,6 +80,7 @@ public class Server extends WebSocketServer {
     //most important method of the server, controls the flow of the game
     @Override
     public void onMessage(WebSocket conn, String message) {
+        //every message is logged on the server side to monitor the interactions
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
 
         //verify if the game is active on each message sent to the server
