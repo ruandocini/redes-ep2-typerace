@@ -9,7 +9,7 @@ Repository designed for programming exercise of the discipline Computer Networks
 
 
 
-## Pré-requisites
+## Pre-requisites
 * JDK 11 ou greater 
 * Gradle (included on the repository, installation not nedded)
 
