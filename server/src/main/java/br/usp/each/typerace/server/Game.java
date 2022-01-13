@@ -11,6 +11,9 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 
+//class responsible for the game logic
+//all the interaction in game are done in this class (score, words, vallidation, etc)
+
 
 public class Game {
     
@@ -32,6 +35,7 @@ public class Game {
         return playerWords.get(player).get(0);
     }
 
+
     public void verifyAnswer(String playerId, String word) {
         if(playerWords.get(playerId).contains(word)){
             playerWords.get(playerId).remove(word);
@@ -42,6 +46,7 @@ public class Game {
         }
     }
 
+    //verify if the game is over looking through the scores
     public String verifyWinner() {
         for (String player : playerScores.keySet()) {
             if(playerScores.get(player) >= WINNING_SCORE){
@@ -51,12 +56,18 @@ public class Game {
         return null;
     }
 
+
+    //initialize the players in all the aspects nedded for the game (errors, scores, words)
     public void addPlayer(String playerId) {
         playerWords.put(playerId, wordList);
         playerScores.put(playerId, 0);
         playerErrors.put(playerId, 0);
     }
 
+
+    //responsible for generating the leaderboard string to show to the players
+    //the most important part here is the sorting of the players by score
+    //to show the pontuation in descending order 
     public String leaderBoard() {
 
         int counter = 1;
