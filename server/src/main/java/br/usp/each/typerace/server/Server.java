@@ -24,6 +24,8 @@ public class Server extends WebSocketServer {
         this.connections = connections;
     }
 
+    //Method that talks to all clients when a connection happens 
+    //Keep everyone in the game at the same page about whos connected
     @Override
     public void onOpen(WebSocket conn, ClientHandshake handshake) {
 
@@ -40,11 +42,14 @@ public class Server extends WebSocketServer {
 
     }
 
+    //method used to get the player id from the connection
     private String playerId(WebSocket conn) {
         String connInfos = conn.getResourceDescriptor();
         return connInfos.substring(connInfos.indexOf("username=") + 9);
     }
 
+    //method used to validate the player id 
+    //looking if theres another players with the same id
     private boolean idValidator(WebSocket conn) {
         if(connections.containsKey(playerId(conn))) {
             conn.send("Username already taken\n");
@@ -55,6 +60,7 @@ public class Server extends WebSocketServer {
         return true;
     }    
 
+    //when the conn is closed, remove its name from the poll and broadcast that the player left for everyone
     @Override
     public void onClose(WebSocket conn, int code, String reason, boolean remote) {
         String username = playerId(conn);
@@ -63,6 +69,7 @@ public class Server extends WebSocketServer {
         System.out.println("Player " + username + " left, " + connections.size() + " players left");
     }
 
+    //Just a simple menu used to show the possibliities to the player on connection
     public String menuGame(){
         return "MENU\n"+
                 "\n- start: to start the game, when all players are ready\n"+
@@ -70,10 +77,15 @@ public class Server extends WebSocketServer {
                 "\n\n- Have fun fella\n";
     } 
 
+    //most important method of the server, controls the flow of the game
     @Override
     public void onMessage(WebSocket conn, String message) {
         System.out.println("Message received from [" + playerId(conn) + "] :" + message);
 
+        //verify if the game is active on each message sent to the server
+        //important to define if the message is a command or a word in the game 
+        //this part does the game exectution flow, calling the fuction to send the word to the player and verify answer
+        //also used to track how much time the game took
         if(isGameStarted){
             currentGame.verifyAnswer(playerId(conn), message);
             String winner = currentGame.verifyWinner();
@@ -89,6 +101,10 @@ public class Server extends WebSocketServer {
             }
         }
 
+        //counts the players that are ready for the game
+        //I implemented this to avoid the game to start before all players are ready
+        //if the player is ready, add it to the list of ready players
+        //just start the game when all players are ready, I thought it was a better idea the just one player starting
         if (message.equals("start")) {
             if (readyPlayers.contains(playerId(conn))) {
                 conn.send("You are already prepared\n");
@@ -102,6 +118,9 @@ public class Server extends WebSocketServer {
                         broadcast("Player " + playerId(c) + ": NOT READY");
                     }
                 }
+
+                //note that the first word is only broadcasted because it happens at the same time for everyone
+                //after that the interaction is individual between each player and the server
                 if (readyPlayers.size() == connections.size()) {
                     broadcast("All players are ready, starting game");
                     broadcast("First word below:");

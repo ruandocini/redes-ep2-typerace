@@ -27,6 +27,9 @@ public class ClientMain {
 
         WebSocketClient client;
 
+        // Used to connect to the server using the credentials given by the user
+        // If an error happens, you must type all the credentials again
+        // If the connection is refused a exception is thrown and the loop continues
         while(true) {
 
             System.out.println("\nType the PORT of the server (defaults to 8080): ");
@@ -47,6 +50,7 @@ public class ClientMain {
                 continue;
             }
 
+            //used to prevent usernames that are not a single word
             username = username.replaceAll("\\s", ""); 
 
             finalServer += "/username=" + username;
@@ -65,6 +69,7 @@ public class ClientMain {
             }
         }
 
+        //Loop to keep reading the user input until the server closes the connection
         while(client.isOpen()) {
             String in = input.nextLine();
 

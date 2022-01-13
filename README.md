@@ -5,6 +5,8 @@ Repository designed for programming exercise of the discipline Computer Networks
 * Ruanitto Roberto Docini - 11390806
 * Claudia Alissa Kimura - 10284761
 * Vanessa Alves do Nascimento - 10882848
+* Lucas Alexandre Martins dos Praseres - 11208284
+
 
 
 ## Pré-requisites
