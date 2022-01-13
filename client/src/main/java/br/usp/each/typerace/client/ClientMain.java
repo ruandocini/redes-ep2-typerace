@@ -24,18 +24,19 @@ public class ClientMain {
     public static void main(String[] args) throws URISyntaxException, InterruptedException {
         
         Scanner input = new Scanner(System.in);
-        System.out.println("\nType the adress of the server (defaults to ws://localhost:8080): ");
-        String customServer = input.nextLine();
-
-        String finalServer = "ws://localhost:8080";
-
-        if (!customServer.isEmpty()) {
-            finalServer = customServer;
-        }       
 
         WebSocketClient client;
 
         while(true) {
+
+            System.out.println("\nType the PORT of the server (defaults to 8080): ");
+            String customServer = input.nextLine();
+
+            String finalServer = "ws://localhost:";
+
+            if (!customServer.isEmpty()) {
+                finalServer += customServer;
+            }       
 
             System.out.println("Insert an username");
 
@@ -60,7 +61,7 @@ public class ClientMain {
                 break;
             }
             else{
-                finalServer = "ws://localhost:8080";
+                finalServer = "ws://localhost:";
             }
         }
 
@@ -73,7 +74,7 @@ public class ClientMain {
             } else{
                 client.send(in);
             }
-            
+
         }
 
         System.exit(0);
